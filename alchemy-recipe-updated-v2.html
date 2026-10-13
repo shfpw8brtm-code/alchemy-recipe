@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f3edf9">
+<title>錬金術師のレシピ</title>
+<style>
+:root{
+  --bg:#f7f4fa;--paper:#fff;--ink:#292333;--muted:#746b7d;
+  --accent:#7654a3;--accent-dark:#56377e;--line:#e4dbea;
+  --soft:#eee6f6;--good:#e8f5ed;--shadow:0 5px 18px #3c28500c;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;line-height:1.5}
+button,input{font:inherit}
+button{cursor:pointer;touch-action:manipulation}
+#app{max-width:620px;min-height:100dvh;margin:0 auto;padding:20px 16px calc(28px + env(safe-area-inset-bottom));display:flex;flex-direction:column}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;gap:12px}
+.brand{font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.06em}
+.round-tag{font-size:12px;color:var(--accent-dark);background:var(--soft);padding:5px 10px;border-radius:999px}
+main{flex:1}
+h1,h2,h3,p{margin-top:0}
+h1{font-size:clamp(27px,7vw,38px);line-height:1.25;text-align:center;margin:16px 0 10px}
+h2{font-size:24px;line-height:1.3;margin-bottom:8px}
+h3{font-size:17px;margin-bottom:8px}
+p{margin-bottom:12px}
+.sub{color:var(--muted);font-size:14px}
+.center{text-align:center}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:var(--shadow);margin:14px 0}
+.hero{padding:30px 20px;text-align:center;margin-top:9vh}
+.emoji-title{font-size:46px;letter-spacing:.12em;margin:12px 0}
+button.primary,button.secondary,button.ghost{width:100%;border:0;border-radius:14px;padding:14px 16px;font-weight:750;min-height:50px}
+button.primary{background:var(--accent);color:#fff}
+button.primary:active{background:var(--accent-dark)}
+button.secondary{background:var(--soft);color:var(--accent-dark);border:1px solid #dfd1ed}
+button.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.stack{display:grid;gap:10px}
+.row{display:flex;align-items:center;gap:10px}
+.row>*{min-width:0}
+.row.between{justify-content:space-between}
+.counter{display:flex;align-items:center;gap:15px}
+.counter button{width:44px;height:44px;border:1px solid var(--line);background:var(--soft);color:var(--accent-dark);border-radius:12px;font-size:23px;font-weight:700}
+.counter strong{font-size:24px;min-width:28px;text-align:center}
+.field{display:grid;gap:6px;margin:12px 0}
+label{font-size:14px;font-weight:700}
+input[type=text]{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff;color:var(--ink);min-height:46px}
+.player-row{display:grid;grid-template-columns:30px 1fr 42px;gap:8px;align-items:center;margin:8px 0}
+.player-row .num{color:var(--muted);font-size:13px;text-align:center}
+.player-row button{height:42px;border:1px solid var(--line);border-radius:12px;background:#fff;color:#9d3c53;font-size:20px}
+.choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:16px 0}
+.material{min-height:112px;background:#fff;border:2px solid var(--line);border-radius:16px;padding:14px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;text-align:center;color:var(--ink)}
+.material .emoji{font-size:28px}
+.material .name{font-size:14px;font-weight:700;overflow-wrap:anywhere}
+.material.selected{border-color:var(--accent);background:var(--soft);box-shadow:0 0 0 2px #7654a31c}
+.full{grid-column:1/-1}
+.big-emoji{font-size:44px;text-align:center;margin:8px 0}
+.notice{background:var(--soft);border-radius:16px;padding:16px;text-align:center}
+.hidden{display:none!important}
+.fade{animation:fadeIn .75s ease both}
+@keyframes fadeIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.name-part{padding:12px;border-bottom:1px solid var(--line);font-size:20px;font-weight:750;text-align:center;animation:fadeIn .65s ease both}
+.name-part:last-child{border-bottom:0}
+.potion-name{font-size:24px;font-weight:850;text-align:center;overflow-wrap:anywhere;padding:14px 4px}
+.effect-text{font-size:17px;line-height:1.7;text-align:center;font-weight:700}
+.vote-option{display:flex;align-items:center;gap:12px;width:100%;padding:14px;border:2px solid var(--line);border-radius:14px;background:#fff;text-align:left;color:var(--ink);margin:8px 0;min-height:66px}
+.vote-option.selected{border-color:var(--accent);background:var(--soft)}
+.vote-option .material-emoji{font-size:25px}
+.vote-option .vote-name{font-weight:750}
+.vote-option .vote-material{font-size:13px;color:var(--muted)}
+.vote-option .mark{margin-left:auto;font-size:20px;color:var(--accent)}
+.score-row{display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.score-row:last-child{border-bottom:0}
+.score{font-weight:800;color:var(--accent-dark);white-space:nowrap}
+.small{font-size:12px;color:var(--muted)}
+footer{padding-top:14px;text-align:center;color:var(--muted);font-size:11px}
+hr{border:0;border-top:1px solid var(--line);margin:16px 0}
+@media(min-width:520px){.choice-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.material{min-height:125px}}
+@media(prefers-reduced-motion:reduce){.fade,.name-part{animation:none}}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="brand">⚗️ PARTY ALCHEMY</div>
+    <div id="roundTag" class="round-tag hidden"></div>
+  </header>
+  <main id="screen"></main>
+  <footer>錬金術師のレシピ · みんなで遊ぶスマホゲーム</footer>
+</div>
+<script>
+"use strict";
+const MATERIALS = [
+["魚のヒゲ","🐟"],["A5ランク和牛","🥩"],["作業着","🦺"],["多分聖水","💧"],["吸血鬼の燃えかす","🧛"],
+["キムチ鍋","🍲"],["日本人","🧑"],["電車","🚃"],["金の斧","🪓"],["大根(亜種)","🥬"],
+["湿ったティッシュ","🧻"],["祖父の盆栽","🪴"],["冷めたたこ焼き","🐙"],["片方だけの靴下","🧦"],["未開封の納豆","🫘"],
+["校長先生の話","🎤"],["壊れかけの扇風機","🪭"],["謎の領収書","🧾"],["二日前のカレー","🍛"],["使用済みの切符","🎫"],
+["ドラゴンの鼻水","🐉"],["魔王の健康診断書","📋"],["妖精の残業届","🧚"],["呪われた目覚まし時計","⏰"],["ちぢれた人参","🥕"],
+["勇者のへそのごま","🦸"],["人魚の入れ歯","🧜"],["平ヤスリ(油目)","🛠️"],["伝説の石ころ","🪨"],["召喚に失敗した何か","🌀"],
+["賞味期限ギリギリのプリン","🍮"],["激辛ショートケーキ","🍰"],["巨大な餃子","🥟"],["納豆味のキャンディ","🍬"],["冷凍されたたい焼き","🐟"],
+["無限に伸びる餅","🍡"],["母の手作り弁当","🍱"],["炭酸抜けたコーラ","🥤"],["生焼けの焼きそば","🍜"],["高級そうな梅干し","🔴"],
+["知らない人のハンコ","🈯"],["謎のUSBメモリ","💾"],["金色の軍手","🧤"],["しゃべる消しゴム","✏️"],["未完成の銅像","🗿"],
+["折れた伝説の剣","⚔️"],["やたら重い石","🪨"],["返品されたロボット","🤖"],["透明な段ボール","📦"],["予備の予備のネジ","🔩"],
+["二代目の大根","🥬"],["昨日の自分","🪞"],["野生の課長","💼"],["概念としての布団","🛏️"],["たぶん国宝","🏺"],
+["宇宙人の健康保険証","👽"],["半分だけ賢いフクロウ","🦉"],["人類最後の輪ゴム","⭕"],["巨大化した納税通知書","📄"],["大根(別個体)","🥬"]
+];
+const NAME_PARTS = [
+"神々しい","亜種","A5ランクの","燃えかすの","概念","たぶん","失敗した","入れ歯","話と","鍋",
+"終焉","永遠なる","禁断","漆黒","覚醒した","伝説級","天地創造","究極","呪われし","超古代文明",
+"使用済み","返品された","二日前","半額","未開封","校長先生","作業着","領収書","片方だけ","残業中",
+"爆発する","増殖した","ぬるぬる","ちぢれた","暴走する","溶けかけ","進化しすぎた","うっかり","やたらと","眠れる",
+"ドラゴン味","納豆まみれ","大根型","野生","プリンと","鼻水","靴下","和牛風","たこ焼き級","人魚",
+"だいたい","おしり","なぜか","それっぽい","平ヤスリ製","もう一度","すべてを台無しにする","という設定","だけど","そして伝説へ"
+];
+const EFFECTS = [
+"多分来世は神なんじゃないかな","人類の平均身長をミジンコサイズにする","晴れときどき曇り","ありがとうって言えるようになりそう","おぢさん構文をマスターできる",
+"爆音のバイクをミュートできる","身長の9割を足にする","海を割る","街のそこらへんにデカイ亀散歩してるお婆ちゃんが出現するようになる","アタリの教師割合を増やす",
+"地球の自転が一日だけ逆になる","重力がたまに気まずそうに弱まる","全世界の信号機がじゃんけんで色を決めるようになる","月が毎晩ちょっとずつ近づいてくる（でも誰も気づかない）","世界中の時計が5分だけやる気をなくす",
+"雨粒が地面に落ちる直前に一度だけ跳ね返る","全人類の影が本人より少しだけ偉そうになる","毎週水曜日だけ重力が半分になる","地球上のすべての石に出身地が表示される","太陽がたまにくしゃみをする",
+"どんな料理でも食レポだけは一流になる","寝坊した理由を壮大な冒険譚として語れる","どんな相手にも絶妙に気まずいタイミングで拍手できる","1日に3回だけ時間を止められる（止めている間は自分も動けない）","すべての動物に初対面から顔なじみ扱いされる",
+"どんな曲でも演歌風に歌える","一度見たレシートの内容を一生忘れなくなる","どんな嘘も語尾に「知らんけど」を付けてしまう","くしゃみをすると近くの人の髪型が一瞬だけアフロになる","人生で一度だけ、絶対に滑らないダジャレを言える",
+"自動ドアが自分にだけ毎回お辞儀する","家中の靴下が必ず左右そろって見つかる","エレベーターの中でだけ壮大なBGMが流れる","コンビニのおにぎりの具がたまに自己紹介してくる","どんな会議も最終的に「一旦持ち帰ります」で終わる",
+"自分の名前を呼ばれると周囲に紙吹雪が舞う","どんなに急いでいても靴ひもが絶対にほどけない","全国の自動販売機に1台ずつ謎のボタンが増える","風呂のお湯が毎回ちょうどいい温度になる","すべての電子レンジが温め終了時にファンファーレを鳴らす",
+"鳩が全員、やたらと礼儀正しくなる","世界中の猫が一日一回だけ人間の悩みに的確な助言をする","大根が地面から抜くときに小さく「よいしょ」と言う","食べたものの栄養成分が頭上に字幕で表示される","魚が全員、海の中でだけ関西弁になる",
+"プリンを食べると5分間だけ王族の気品が身につく","カラスが落とし物を交番まで届けてくれるようになる","世界中の野菜が収穫されるときに卒業証書をもらう","ペンギンがたまに人間の列に混ざって並ぶ","食べたラーメンの感想が自動的に川柳になる",
+"どんな難問にも答えられるが、答える前に必ず3分間の校長先生の話が入る","財布の中に小銭があると、どこからともなくファンファーレが鳴る","1日1回だけ、なくした物が「ここだよ」と小声で教えてくれる","どんな相手とも仲良くなれるが、最初の会話が必ず天気の話になる","全人類が毎晩見る夢の内容を、翌朝の新聞で読めるようになる",
+"どんな壁にも穴を開けられるが、穴の形が必ずハート型になる","1時間だけ、あらゆる機械から「本音」を聞ける","何をしても一日一回だけ拍手喝采が起きる","人生で一度だけ、過去の自分に手紙を送れる（返事は来ない）","世界中の人が、毎月1日に好きな給食メニューを思い出して幸せになる"
+];
+const $ = id => document.getElementById(id);
+const screen = $("screen");
+const state = {
+  rounds:3, names:["研究者A","研究者B"], orderMode:"registration",
+  round:1, players:[], turnOrder:[], picks:[], assignedParts:[], effect:"",
+  usedMaterials:[], usedNameParts:[],
+  selectedMaterial:null, revealIndex:0, revealMode:"record", isRevealing:false, showEffect:false, voters:[], voteIndex:0,
+  votes:[], scores:{}, history:[], selectedVote:null
+};
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function btn(label,fn,kind="primary",disabled=false){return `<button class="${kind}" data-action="${fn}" ${disabled?"disabled":""}>${label}</button>`;}
+function setScreen(html,tag=""){screen.innerHTML=html;$("roundTag").textContent=tag;$("roundTag").classList.toggle("hidden",!tag);window.scrollTo({top:0,behavior:"smooth"});}
+function titleScreen(){setScreen(`<section class="panel hero">
+<div class="emoji-title">⚗️ 🧪 ✨</div>
+<h1>錬金術師の<br>レシピ</h1>
+<p class="sub">材料を混ぜて、へんてこな薬をつくろう！</p>
+<div class="stack" style="margin-top:26px">${btn("はじめる","setup")}</div>
+</section>`);}
+function setupScreen(){
+ const rows=state.names.map((n,i)=>`<div class="player-row"><span class="num">${i+1}</span><input type="text" maxlength="10" data-name-index="${i}" aria-label="プレイヤー${i+1}の名前" value="${esc(n)}" placeholder="プレイヤー名"><button data-action="remove-player" data-index="${i}" aria-label="削除" ${state.names.length<=2?"disabled":""}>×</button></div>`).join("");
+ setScreen(`<h2>ゲームの準備</h2><p class="sub">遊び方を設定して、錬金術を始めよう。</p>
+ <section class="panel"><div class="row between"><div><h3>ラウンド数</h3><p class="sub">何回薬をつくる？</p></div><div class="counter"><button data-action="round-minus" aria-label="ラウンド数を減らす">−</button><strong>${state.rounds}</strong><button data-action="round-plus" aria-label="ラウンド数を増やす">＋</button></div></div></section>
+ <section class="panel"><div class="row between"><div><h3>プレイヤー登録</h3><p class="sub">名前は10文字以内（2〜5人）</p></div><span class="round-tag">${state.names.length}/5人</span></div>
+ ${rows}${btn("＋ プレイヤーを追加","add-player","secondary",state.names.length>=5)}
+ </section>
+ <section class="panel"><h3>プレイ順</h3><div class="stack">
+ <button class="${state.orderMode==="registration"?"primary":"ghost"}" data-action="order-registration">プレイヤー登録順</button>
+ <button class="${state.orderMode==="random"?"primary":"ghost"}" data-action="order-random">ランダム（ラウンドごとに変更）</button>
+ </div></section>
+ <div class="stack">${btn("薬をつくる","start-game")}</div>`);
+}
+function passScreen(name,buttonLabel,action,sub="次の人にスマホを渡してください。"){
+ setScreen(`<section class="panel hero" style="margin-top:7vh"><div class="big-emoji">🔒</div><h2>${esc(name)}だけ<br>画面を見てください</h2><p class="sub">${esc(sub)}</p><div class="stack">${btn(buttonLabel,action)}</div></section>`,`第${state.round}/${state.rounds}ラウンド`);
+}
+function startGame(){
+ // Commit any currently focused name before transitioning.
+ document.querySelectorAll("[data-name-index]").forEach(el=>{const i=Number(el.dataset.nameIndex);state.names[i]=el.value.trim().slice(0,10)||`研究者${i+1}`;});
+ state.names=state.names.slice(0,5);
+ state.players=state.names.map((name,i)=>({id:i,name:name.trim()||`研究者${i+1}`,score:0,roundScores:[]}));
+ state.players.forEach(p=>{p.score=0;p.roundScores=[];});
+ state.scores={};state.history=[];state.round=1;
+ state.usedMaterials=[];state.usedNameParts=[];
+ beginRound();
+}
+function beginRound(){
+ state.turnOrder=state.orderMode==="random"?shuffle(state.players.map(p=>p.id)):state.players.map(p=>p.id);
+ state.picks=[];state.selectedMaterial=null;state.assignedParts=[];state.effect="";
+ state.voters=[...state.turnOrder];state.votes=[];state.voteIndex=0;state.selectedVote=null;
+ const first=playerById(state.turnOrder[0]);
+ passScreen(first.name,"材料を選ぶ","show-materials","自分の番になったらボタンを押してね。");
+}
+function playerById(id){return state.players.find(p=>p.id===id);}
+function currentPicker(){return playerById(state.turnOrder[state.picks.length]);}
+function showMaterials(){
+ const used=new Set(state.usedMaterials);
+ const pool=MATERIALS.filter(m=>!used.has(m[0]));
+ if(pool.length<5){setScreen(`<section class="panel"><h2>材料が足りません</h2><p>このラウンドで使える材料が5枚未満になりました。</p>${btn("戻る","setup","secondary")}</section>`);return;}
+ const options=shuffle(pool).slice(0,5);
+ state.currentOptions=options;
+ state.selectedMaterial=null;
+ setScreen(`<h2>材料を選ぼう！</h2><p class="sub center">${esc(currentPicker().name)}さんの番 · 1枚選択</p>
+ <div class="choice-grid">${options.map((m,i)=>`<button class="material" data-action="select-material" data-index="${i}"><span class="emoji">${m[1]}</span><span class="name">${esc(m[0])}</span></button>`).join("")}</div>
+ <div class="stack">${btn("材料にする","confirm-material","primary",true)}</div>`, `第${state.round}/${state.rounds}ラウンド`);
+}
+function confirmMaterial(){
+ if(!state.selectedMaterial)return;
+ const p=currentPicker();
+ // A material card and its secret name fragment can only be used once per game.
+ const availableParts=NAME_PARTS.filter(part=>!state.usedNameParts.includes(part));
+ if(!availableParts.length){
+   setScreen(`<section class="panel"><h2>名前パーツが足りません</h2><p>新しいゲームを始めてね。</p>${btn("タイトルへ","end-game")}</section>`);
+   return;
+ }
+ const namePart=shuffle(availableParts)[0];
+ state.usedMaterials.push(state.selectedMaterial.name);
+ state.usedNameParts.push(namePart);
+ state.picks.push({playerId:p.id,material:state.selectedMaterial,namePart});
+ if(state.picks.length<state.players.length){
+   const next=playerById(state.turnOrder[state.picks.length]);
+   passScreen(next.name,"材料を選ぶ","show-materials","前の人の選んだ材料は秘密です。");
+ }else{
+   revealModeScreen();
+ }
+}
+function revealModeScreen(){
+ setScreen(`<section class="panel hero" style="margin-top:5vh"><div class="big-emoji">🧪</div><h2>完成した薬を<br>どうする？</h2><p class="sub">発表の順番が変わるよ！</p><div class="stack">${btn("📖 記録する","reveal-record")} ${btn("🥤 飲む","reveal-drink","secondary")}</div></section>`,`第${state.round}/${state.rounds}ラウンド`);
+}
+function prepareReveal(mode){
+ state.revealMode=mode;
+ state.assignedParts=state.picks.map(p=>({part:p.namePart}));
+ state.effect=shuffle(EFFECTS)[0];
+ state.revealIndex=0;
+ state.isRevealing=false;
+ state.showEffect=false;
+ renderReveal();
+}
+function renderReveal(){
+ const record=state.revealMode==="record";
+ const partsHtml=state.assignedParts.slice(0,state.revealIndex).map((x,i)=>`<div class="name-part" style="animation-delay:${i*.04}s">${esc(x.part)}</div>`).join("");
+ const fullName=state.assignedParts.map(x=>x.part).join(" ")+" 薬";
+ let body=`<section class="panel"><div class="center sub">${record?"📖 薬の記録":"🥤 薬を飲んでみた！"}</div>`;
+ if(record){
+   body+=`<h2 class="center">薬の名前</h2><div class="panel" style="padding:6px 14px">${partsHtml||'<p class="sub center">「薬に名前を付ける」を押してね。</p>'}</div>`;
+   if(state.revealIndex>=state.assignedParts.length)body+=`<div class="potion-name fade">${esc(fullName)}</div>`;
+   if(state.showEffect)body+=`<hr><h2 class="center">薬の効果</h2><p class="effect-text fade">${esc(state.effect)}</p>`;
+ }else{
+   body+=`<h2 class="center">薬の効果</h2><p class="effect-text fade">${esc(state.effect)}</p>`;
+   if(state.revealIndex>0)body+=`<hr><h2 class="center">薬の名前</h2><div class="panel" style="padding:6px 14px">${partsHtml}</div>`;
+   else body+=`<hr><h2 class="center">薬の名前</h2><p class="sub center">「薬に名前を付ける」を押してね。</p>`;
+   if(state.revealIndex>=state.assignedParts.length)body+=`<div class="potion-name fade">${esc(fullName)}</div>`;
+ }
+ body+=`</section>`;
+ if(state.revealIndex<state.assignedParts.length){
+   body+=`<div class="stack">${btn("薬に名前を付ける","reveal-next","primary",state.isRevealing)}</div>`;
+ }else if(record && !state.showEffect){
+   body+=`<div class="stack">${btn("薬の効果を見る","reveal-effect")}</div>`;
+ }else{
+   body+=`<div class="stack">${btn("投票","start-voting")}</div>`;
+ }
+ setScreen(body,`第${state.round}/${state.rounds}ラウンド`);
+}
+function nextReveal(){
+ if(state.isRevealing || state.revealIndex>=state.assignedParts.length)return;
+ state.isRevealing=true;
+ const step=()=>{
+   state.revealIndex++;
+   state.isRevealing=false;
+   renderReveal();
+   if(state.revealIndex<state.assignedParts.length){
+     state.isRevealing=true;
+     setTimeout(step,650);
+   }
+ };
+ step();
+}
+function revealEffect(){
+ state.showEffect=true;
+ renderReveal();
+}
+function startVotingIntro(){
+ state.voteIndex=0;state.votes=[];state.selectedVote=null;
+ setScreen(`<section class="panel hero" style="margin-top:4vh"><div class="big-emoji">🗳️</div><h2>1番おかしな材料を<br>入れた研究者を選べ！</h2><p class="sub">自分以外の研究者から1人を選んでね。</p><div class="stack">${btn("投票する","begin-vote-turn")}</div></section>`,`第${state.round}/${state.rounds}ラウンド`);
+}
+function currentVoter(){return playerById(state.voters[state.voteIndex]);}
+function beginVoteTurn(){
+ if(state.voteIndex>=state.voters.length){showVoteResults();return;}
+ passScreen(currentVoter().name,"投票する","show-ballot","他の人に投票内容を見られないようにしてね。");
+}
+function showBallot(){
+ const voter=currentVoter();
+ const options=state.picks.filter(p=>p.playerId!==voter.id);
+ state.selectedVote=null;
+ setScreen(`<h2>🗳️ 1番おかしな材料を入れた研究者を選べ！</h2><p class="sub center">${esc(voter.name)}さんの投票</p>
+ <div>${options.map(p=>{const pl=playerById(p.playerId);return `<button class="vote-option" data-action="select-vote" data-player="${p.playerId}"><span class="material-emoji">${p.material.emoji||MATERIALS.find(m=>m[0]===p.material.name)?.[1]||"🧪"}</span><span><span class="vote-name">${esc(pl.name)}</span><br><span class="vote-material">材料：${esc(p.material.name)}</span></span><span class="mark">${state.selectedVote===p.playerId?"✓":"○"}</span></button>`;}).join("")}</div>
+ <div class="stack">${btn("票を入れる","confirm-vote","primary",true)}</div>
+ <p class="small center">自分自身には投票できません。</p>`,`第${state.round}/${state.rounds}ラウンド`);
+}
+function confirmVote(){
+ if(state.selectedVote===null)return;
+ state.votes.push({voterId:currentVoter().id,targetId:state.selectedVote});
+ state.voteIndex++;
+ if(state.voteIndex<state.voters.length)beginVoteTurn();else showVoteResults();
+}
+function voteCounts(){
+ const counts={};state.players.forEach(p=>counts[p.id]=0);
+ state.votes.forEach(v=>counts[v.targetId]++);
+ return counts;
+}
+function showVoteResults(){
+ const counts=voteCounts();
+ const ranked=state.players.map(p=>({...p,votes:counts[p.id]})).sort((a,b)=>b.votes-a.votes||a.name.localeCompare(b.name,"ja"));
+ let previousVotes=null,rank=0;
+ ranked.forEach((p,i)=>{if(p.votes!==previousVotes)rank=i+1;previousVotes=p.votes;p.roundRank=rank;p.roundPoints=rank===1?2:rank===2?1:0;});
+ ranked.forEach(p=>{const original=playerById(p.id);original.score+=p.roundPoints;original.roundScores.push(p.roundPoints);});
+ const name=state.assignedParts.map(x=>x.part).join(" ")+" 薬";
+ state.history.push({round:state.round,name,effect:state.effect,picks:state.picks.map(p=>({playerId:p.playerId,material:p.material.name,emoji:p.material.emoji||MATERIALS.find(m=>m[0]===p.material.name)?.[1]||"🧪",part:state.assignedParts[state.picks.findIndex(x=>x.playerId===p.playerId)].part})),ranked:ranked.map(p=>({id:p.id,name:p.name,votes:p.votes,points:p.roundPoints}))});
+ const rows=ranked.map((p,i)=>`<div class="score-row"><span>${p.votes>0&&i===0?"🏆":p.votes>0&&p.roundPoints===1?"🥈":"🧪"}</span><div><strong>${esc(p.name)}</strong><div class="small">${p.votes}票 · ${p.roundRank}位</div></div><div class="score">+${p.roundPoints}点</div></div>`).join("");
+ const last=state.round>=state.rounds;
+ setScreen(`<section class="panel"><div class="big-emoji">🏆</div><h2 class="center">この研究者が最高！</h2><p class="sub center">第${state.round}ラウンドの結果</p><hr>${rows}</section><div class="stack">${btn(last?"総合結果":"次のラウンド",last?"overall-results":"next-round")}</div>`,`第${state.round}/${state.rounds}ラウンド`);
+}
+function rankLabel(votes,ranked){const sorted=[...new Set(ranked.map(p=>p.votes))].sort((a,b)=>b-a);const i=sorted.indexOf(votes);return `${i+1}位`;}
+function nextRound(){state.round++;beginRound();}
+function overallResults(){
+ const ranked=[...state.players].sort((a,b)=>b.score-a.score||a.name.localeCompare(b.name,"ja"));
+ let lastScore=null,rank=0;
+ const rows=ranked.map((p,i)=>{if(p.score!==lastScore)rank=i+1;lastScore=p.score;return `<div class="score-row"><span>${rank===1?"👑":rank===2?"🥈":rank===3?"🥉":"🧪"}</span><div><strong>${esc(p.name)}</strong><div class="small">${p.roundScores.map((s,i)=>`R${i+1}:${s}点`).join(" / ")}</div></div><div class="score">${p.score}点</div></div>`;}).join("");
+ setScreen(`<section class="panel"><div class="big-emoji">👑</div><h2 class="center">最優秀研究者</h2><p class="sub center">${state.rounds}ラウンドの総合結果</p><hr>${rows}</section><div class="stack">${btn("ゲーム終了","end-game")}</div>`);
+}
+function resetGame(){state.rounds=3;state.names=["研究者A","研究者B"];state.orderMode="registration";state.round=1;state.players=[];state.history=[];state.usedMaterials=[];state.usedNameParts=[];titleScreen();}
+function handleAction(el){
+ const action=el.dataset.action;
+ switch(action){
+ case "setup":setupScreen();break;
+ case "round-minus":state.rounds=Math.max(2,state.rounds-1);setupScreen();break;
+ case "round-plus":state.rounds=Math.min(5,state.rounds+1);setupScreen();break;
+ case "add-player":if(state.names.length<5){state.names.push(`研究者${String.fromCharCode(65+state.names.length)}`);}setupScreen();break;
+ case "remove-player":if(state.names.length>2){state.names.splice(Number(el.dataset.index),1);}setupScreen();break;
+ case "order-registration":state.orderMode="registration";setupScreen();break;
+ case "order-random":state.orderMode="random";setupScreen();break;
+ case "start-game":startGame();break;
+ case "show-materials":showMaterials();break;
+ case "select-material":{
+   const idx=Number(el.dataset.index);state.selectedMaterial={name:state.currentOptions[idx][0],emoji:state.currentOptions[idx][1]};
+   document.querySelectorAll(".material").forEach(b=>b.classList.toggle("selected",Number(b.dataset.index)===idx));
+   const confirm=document.querySelector('[data-action="confirm-material"]');if(confirm)confirm.disabled=false;
+   break;
+ }
+ case "confirm-material":confirmMaterial();break;
+ case "reveal-record":prepareReveal("record");break;
+ case "reveal-drink":prepareReveal("drink");break;
+ case "reveal-next":nextReveal();break;
+ case "reveal-effect":revealEffect();break;
+ case "start-voting":startVotingIntro();break;
+ case "begin-vote-turn":beginVoteTurn();break;
+ case "show-ballot":showBallot();break;
+ case "select-vote":{
+   state.selectedVote=Number(el.dataset.player);
+   document.querySelectorAll(".vote-option").forEach(b=>{const selected=Number(b.dataset.player)===state.selectedVote;b.classList.toggle("selected",selected);const mark=b.querySelector(".mark");if(mark)mark.textContent=selected?"✓":"○";});
+   const confirm=document.querySelector('[data-action="confirm-vote"]');if(confirm)confirm.disabled=false;
+   break;
+ }
+ case "confirm-vote":confirmVote();break;
+ case "next-round":nextRound();break;
+ case "overall-results":overallResults();break;
+ case "end-game":resetGame();break;
+ }
+}
+screen.addEventListener("click",e=>{const el=e.target.closest("[data-action]");if(el&&!el.disabled)handleAction(el);});
+screen.addEventListener("change",e=>{
+ const el=e.target.closest("[data-name-index]");
+ if(el){state.names[Number(el.dataset.nameIndex)]=el.value.trim().slice(0,10);}
+});
+titleScreen();
+</script>
+</body>
+</html>
